@@ -1,31 +1,39 @@
-# Taller Sincronización - Patrón de sincronización por barrera.
+# Synchronization Workshop - Barrier Synchronization Pattern
 
-En este laboratorio se da un programa que se crea N hilos que realizan una misma tarea a una velocidad diferente,
-y al final promedia el tiempo de ejecución de todos lo hilos. 
+In this lab, a program is provided that creates N threads. Each thread performs the same task at a different speed, and at the end, the program calculates the average execution time of all the threads.
 
-## Problema inical
+## Initial Problem
 
-En la primera versión del programa, al ejecutarlo, se crean 20 hilos, estos empiezan con sus tareas y van reportándose en diferente orden según su velocidad.
-Sin embargo, antes de que se muestren los mensajes de los hilos en ejecución, se muestra primero el mensaje: "El tiempo promedio de ejecución fue de: 0". Esto es
-incorrecto, ya que el mensaje se debería mostrar al final de todo el proceso después de que todos los hilos hayan terminado, y el resultado, naturalmente debe ser mayor a 0.
+In the first version of the program, when it is executed, 20 threads are created. These threads start performing their tasks and report their progress in different orders depending on their execution speed.
 
-Esto indica que no se está controlando correctamente la ejecución del cálculo del tiempo total, ya que no hay nada que "pause" la ejecución
-mientras el resto de hilos terminen su tarea.
+However, before the messages from the running threads are displayed, the following message appears first:
+
+"El tiempo promedio de ejecución fue de: 0"
+
+This is incorrect because this message should be displayed at the end of the whole process, after all the threads have finished. Naturally, the result should be greater than 0.
+
+This shows that the calculation of the total execution time is not being controlled correctly, since there is nothing that pauses the execution of the main thread while the rest of the threads finish their tasks.
 
 ![1](images/img1.png)
 
+## Solution
 
-## Solución
+To solve this problem, the barrier synchronization strategy was used. For this, an instance of Java's `CyclicBarrier` class is created with the number of threads that will be created plus one, in order to include the main thread as well.
 
-Para solucionar el problema, se usó la estrategia de sincronización por barrera. Para esto, se crea una instancia de la clase CyclicBarrier
-de Java con el número de hilos que se van a crear más uno, para contar el hilo del proceso main. Luego se le pasa este objeto en el constructor a todos
-los hilos, que lo guardan en un atributo. Luego, dentro del método run de los hilos, al final, después de calcular el tiempo total de ejecución, se hace un llamado a la 
-barrera con el metodo await. Dentro del método main también se llama el metodo await de la barrera desdpués de llamar la función star de todos los hilos.
+Then, this `CyclicBarrier` object is passed through the constructor to all the threads, and each thread stores it as an attribute.
 
-De esta manera, cuando cada hilo termina su ejecución, informa a la barrera, y cuando los 20 hilos terminan, y la funcion main también llama a la 
-funcion await, se termina de ejecutar el resto del codigo dentro de los objetos. En el caso de los hilos de procesos, no tienen nada que hacer entonces mueren, y en caso del hilo main,
-continua con el cálculo del promedio de tiempo de ejecución.
+Inside the `run` method of each thread, after calculating the total execution time, the thread calls the barrier using the `await` method.
+
+Inside the `main` method, the `await` method of the barrier is also called after calling the `start` method on all the threads.
+
+In this way, when each thread finishes its execution, it notifies the barrier. When the 20 worker threads have finished and the main thread also calls the `await` method, the rest of the code continues executing.
+
+In the case of the worker threads, they do not have anything else to do, so they finish their execution. In the case of the main thread, it continues with the calculation of the average execution time.
 
 ![2](images/img2.png)
+
+
 ![3](images/img3.png)
+
+
 ![4](images/img4.png)
